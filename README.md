@@ -1,4 +1,4 @@
-# XML Parser Remastered
-## Lab #3 on OOP
+# Excel Remastered
+## Lab #2 on OOP
 Author: Pavlenko Andrew, K-24
 For: Efim, K-25
