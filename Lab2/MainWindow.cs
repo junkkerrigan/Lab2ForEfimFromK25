@@ -26,38 +26,40 @@ namespace Lab2
     // inc dec
     // power
     // java -jar antlr-4.7.2-complete.jar -Dlanguage=CSharp.\Lab2Grammar.g4 -visitor 
-    public static class Prompt
+    public static class Dialog
     {
-        public static string ShowDialog(string text, string caption)
+        public static string Show(string text, string caption)
         {
             Form prompt = new Form()
             {
-                Width = 400,
-                Height = 200,
+                Width = 600,
+                Height = 400,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 Text = caption,
                 StartPosition = FormStartPosition.CenterScreen
             };
             Label textLabel = new Label()
             {
-                Left = 50,
-                Top = 20,
+                Left = 70,
+                Top = 90,
                 Text = text,
-                Width = 300
+                Width = 400
             };
-            TextBox textBox = new TextBox()
+            RichTextBox textBox = new RichTextBox()
             {
-                Left = 50,
-                Top = textLabel.Bottom + 5,
-                Width = 300
+                Left = 70,
+                Top = textLabel.Bottom + 30,
+                Width = 400,
+                Height = 40,
+                Font = new Font("Times New Roman", 16),
             };
             Button confirmation = new Button()
             {
                 Text = "Submit",
-                Left = textBox.Right - 115,
-                Width = 100,
-                Height = 30,
-                Top = textBox.Bottom + 10,
+                Left = textBox.Right - 110,
+                Width = 90,
+                Height = 40,
+                Top = textBox.Bottom + 30,
                 DialogResult = DialogResult.OK
             };
             confirmation.Click += (sender, e) => { prompt.Close(); };
@@ -111,39 +113,60 @@ namespace Lab2
         public TableView Table { get; set; }
         bool UpToDate = true;
         TextBox ExpressionInCell;
-        Panel Toolbar;
+        Panel MenuPanel;
         Label Rows, Cols;
         Button AddRow, AddCol, DelRow, DelCol, Save, Open;
         public MainWindow()
         {
             InitializeComponent();
-            AddToolbar();
+            AddMenuPanel();
             AddTable();
-            Resize += MainWindow_Resize;
+            Resize += MainWindow_SizeChanged;
             FormClosed += MainWindow_FormClosed;
         }
-        void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
+        void AddMenuPanel()
         {
-            if (UpToDate) return;
-            var isSave = MessageBox.Show("You have unsaved changes, they will be lost if you" +
-                " close the application. Save changes?", "Danger", MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-            if (isSave == DialogResult.Yes)
+            MenuPanel = new Panel()
             {
-                Save.PerformClick();
-            }
-        }
-        void MainWindow_Resize(object sender, EventArgs e)
-        {
-            Toolbar.Width = ClientSize.Width - 120;
-            Rows.Location = new Point(Math.Max(330, (Toolbar.Width - 300) / 2), 10);
-            AddRow.Location = new Point(Rows.Right, 5);
-            DelRow.Location = new Point(AddRow.Right + 10, 5);
-            Cols.Location = new Point(DelRow.Right + 40, 10);
-            AddCol.Location = new Point(Cols.Right, 5);
-            DelCol.Location = new Point(AddCol.Right + 10, 5);
-            Table.Size = new Size(ClientSize.Width - 60,
-                    ClientSize.Height - Toolbar.Bottom - 60);
+                Location = new Point(60, 60),
+                Size = new Size(ClientSize.Width - 120, 80),
+            };
+            AddFileButtons();
+            ExpressionInCell = new TextBox()
+            {
+                Location = new Point(Open.Right + 50, 0),
+                Font = new Font("Times New Roman", 16),
+                Width = 300,
+            };
+            ExpressionInCell.Leave += (s, e) =>
+            {
+                if (Table.CurCell == null) return;
+                string oldExpr = Table.CurCell.Expression;
+                Table.CurCell.Expression = ExpressionInCell.Text;
+                try
+                {
+                    Table.Recalculate(Table.CurCell);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Data.Contains("Type"))
+                    {
+                        MessageBox.Show($"Invalid expression: {ex.Data["Type"]}",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Invalid expression",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    Table.CurCell.Expression = oldExpr;
+                    Table.Recalculate(Table.CurCell);
+                }
+                UpToDate = false;
+            };
+            MenuPanel.Controls.Add(ExpressionInCell);
+            AddTableButtons();
+            Controls.Add(MenuPanel);
         }
         void AddTable(TableView existing = null)
         {
@@ -151,18 +174,18 @@ namespace Lab2
             {
                 Table = new TableView(30, 20)
                 {
-                    Location = new Point(30, Toolbar.Bottom + 30),
+                    Location = new Point(30, MenuPanel.Bottom + 30),
                     Size = new Size(ClientSize.Width - 60,
-                        ClientSize.Height - Toolbar.Bottom - 60),
+                        ClientSize.Height - MenuPanel.Bottom - 60),
                 };
             }
             else
             {
                 Table.SuspendLayout();
                 Controls.Remove(Table);
-                existing.Location = new Point(30, Toolbar.Bottom + 30);
+                existing.Location = new Point(30, MenuPanel.Bottom + 30);
                 existing.Size = new Size(ClientSize.Width - 60,
-                    ClientSize.Height - Toolbar.Bottom - 60);
+                    ClientSize.Height - MenuPanel.Bottom - 60);
                 Table = existing;
             }
 
@@ -210,50 +233,6 @@ namespace Lab2
             };
             Controls.Add(Table);
             Table.ResumeLayout();
-        }
-        void AddToolbar()
-        {
-            Toolbar = new Panel()
-            {
-                Location = new Point(60, 60),
-                Size = new Size(ClientSize.Width - 120, 80),
-            };
-            AddFileButtons();
-            ExpressionInCell = new TextBox()
-            {
-                Location = new Point(Open.Right + 50, 0),
-                Font = new Font("Times New Roman", 16),
-                Width = 300,
-            };
-            ExpressionInCell.Leave += (s, e) =>
-            {
-                if (Table.CurCell == null) return;
-                string oldExpr = Table.CurCell.Expression;
-                Table.CurCell.Expression = ExpressionInCell.Text;
-                try
-                {
-                    Table.Recalculate(Table.CurCell);
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Data.Contains("Type"))
-                    {
-                        MessageBox.Show($"Invalid expression: {ex.Data["Type"]}",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Invalid expression",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    Table.CurCell.Expression = oldExpr;
-                    Table.Recalculate(Table.CurCell);
-                }
-                UpToDate = false;
-            };
-            Toolbar.Controls.Add(ExpressionInCell);
-            AddTableButtons();
-            Controls.Add(Toolbar);
         }
         void AddFileButtons()
         {
@@ -304,15 +283,15 @@ namespace Lab2
                     }
                 }
             };
-            Toolbar.Controls.Add(Save);
-            Toolbar.Controls.Add(Open);
+            MenuPanel.Controls.Add(Save);
+            MenuPanel.Controls.Add(Open);
         }
         void AddTableButtons()
         {
             Rows = new Label()
             {
                 Location = new Point(
-                    Math.Max(380, (Toolbar.Width - 300) / 2), 10),
+                    Math.Max(580, (MenuPanel.Width - 300) / 2), 10),
                 Text = "Rows:",
                 Font = new Font("Times New Roman", 12),
                 Size = new Size(70, 30),
@@ -332,7 +311,7 @@ namespace Lab2
             };
             DelRow.Click += (s, e) =>
             {
-                string input = Prompt.ShowDialog("Enter number of row to delete:", "");
+                string input = Dialog.Show("Enter number of row to delete:", "");
                 if (input == "") return;
                 try
                 {
@@ -372,7 +351,7 @@ namespace Lab2
             };
             DelCol.Click += (s, e) =>
             {
-                string input = Prompt.ShowDialog("Enter name of column to delete:", "");
+                string input = Dialog.Show("Enter name of column to delete:", "");
                 if (input == "") return;
                 try
                 {
@@ -389,12 +368,35 @@ namespace Lab2
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             };
-            Toolbar.Controls.Add(Rows);
-            Toolbar.Controls.Add(AddRow);
-            Toolbar.Controls.Add(DelRow);
-            Toolbar.Controls.Add(Cols);
-            Toolbar.Controls.Add(AddCol);
-            Toolbar.Controls.Add(DelCol);
+            MenuPanel.Controls.Add(Rows);
+            MenuPanel.Controls.Add(AddRow);
+            MenuPanel.Controls.Add(DelRow);
+            MenuPanel.Controls.Add(Cols);
+            MenuPanel.Controls.Add(AddCol);
+            MenuPanel.Controls.Add(DelCol);
+        }
+        void MainWindow_SizeChanged(object sender, EventArgs e)
+        {
+            MenuPanel.Width = ClientSize.Width - 120;
+            Rows.Location = new Point(Math.Max(330, (MenuPanel.Width - 300) / 2), 10);
+            AddRow.Location = new Point(Rows.Right, 5);
+            DelRow.Location = new Point(AddRow.Right + 10, 5);
+            Cols.Location = new Point(DelRow.Right + 40, 10);
+            AddCol.Location = new Point(Cols.Right, 5);
+            DelCol.Location = new Point(AddCol.Right + 10, 5);
+            Table.Size = new Size(ClientSize.Width - 60,
+                    ClientSize.Height - MenuPanel.Bottom - 60);
+        }
+        void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (UpToDate) return;
+            var isSave = MessageBox.Show("You have unsaved changes, they will be lost if you" +
+                " close the application. Save changes?", "Danger", MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+            if (isSave == DialogResult.Yes)
+            {
+                Save.PerformClick();
+            }
         }
     }
 }
