@@ -186,7 +186,7 @@ namespace Lab2
             cur.Connected.Clear();
             cur.Connections.Clear();
         }
-        public string Serialize()
+        public string ToFile()
         {
             string data = $"{RowCount} {ColumnCount}\n";
             for (int i = 0; i < RowCount; i++)
@@ -198,7 +198,7 @@ namespace Lab2
             }
             return data;
         }
-        public static TableView CreateFromSerialized(string data)
+        public static TableView FillFromFile(string data)
         {
             try
             {

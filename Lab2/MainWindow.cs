@@ -151,13 +151,11 @@ namespace Lab2
                 {
                     if (ex.Data.Contains("Type"))
                     {
-                        MessageBox.Show($"Invalid expression: {ex.Data["Type"]}",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Bad expression: {ex.Data["Type"]}", "Error");
                     }
                     else
                     {
-                        MessageBox.Show($"Invalid expression",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Bad expression", "Error");
                     }
                     Table.CurCell.Expression = oldExpr;
                     Table.Recalculate(Table.CurCell);
@@ -168,9 +166,9 @@ namespace Lab2
             AddTableButtons();
             Controls.Add(MenuPanel);
         }
-        void AddTable(TableView existing = null)
+        void AddTable(TableView table = null)
         {
-            if (existing == null)
+            if (table == null)
             {
                 Table = new TableView(30, 20)
                 {
@@ -183,10 +181,10 @@ namespace Lab2
             {
                 Table.SuspendLayout();
                 Controls.Remove(Table);
-                existing.Location = new Point(30, MenuPanel.Bottom + 30);
-                existing.Size = new Size(ClientSize.Width - 60,
+                table.Location = new Point(30, MenuPanel.Bottom + 30);
+                table.Size = new Size(ClientSize.Width - 60,
                     ClientSize.Height - MenuPanel.Bottom - 60);
-                Table = existing;
+                Table = table;
             }
 
             Table.CellEnter += (s, e) =>
@@ -218,13 +216,13 @@ namespace Lab2
                 {
                     if (ex.Data.Contains("Type"))
                     {
-                        MessageBox.Show($"Invalid expression: {ex.Data["Type"]}",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Bad expression: {ex.Data["Type"]}", "Error");
+
                     }
                     else
                     {
-                        MessageBox.Show($"Invalid expression",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Bad expression", "Error");
+
                     }
                     changed.Expression = oldExpr;
                     Table.Recalculate(changed);
@@ -247,11 +245,11 @@ namespace Lab2
             {
                 var saveTo = new SaveFileDialog()
                 {
-                    Filter = "Excelerator files (*.xclr)|*.xclr",
+                    Filter = "Text files (*.txt)|*.txt",
                 };
                 if (saveTo.ShowDialog() == DialogResult.OK)
                 {
-                    File.WriteAllText(saveTo.FileName, Table.Serialize());
+                    File.WriteAllText(saveTo.FileName, Table.ToFile());
                 }
                 UpToDate = true;
             };
@@ -266,20 +264,19 @@ namespace Lab2
             {
                 var openFrom = new OpenFileDialog()
                 {
-                    Filter = "Excelerator files (*.xclr)|*.xclr",
+                    Filter = "Text files (*.txt)|*.txt",
                 };
                 if (openFrom.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
                         AddTable(
-                            TableView.CreateFromSerialized(
+                            TableView.FillFromFile(
                                 File.ReadAllText(openFrom.FileName)));
                     }
                     catch
                     {
-                        MessageBox.Show($"Impossible to open: {openFrom.FileName} is not valid" +
-                            $" .xclr file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Bad file: {openFrom.FileName}", "Error");
                     }
                 }
             };
@@ -320,12 +317,12 @@ namespace Lab2
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    MessageBox.Show("Invalid number of row", "Error",
+                    MessageBox.Show("Bad number of row", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 catch
                 {
-                    MessageBox.Show("Invalid input", "Error",
+                    MessageBox.Show("Bad input", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             };
@@ -359,12 +356,12 @@ namespace Lab2
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    MessageBox.Show("Invalid name of column", "Error",
+                    MessageBox.Show("Bad name of column", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 catch
                 {
-                    MessageBox.Show("Invalid input", "Error",
+                    MessageBox.Show("Bad input", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             };
@@ -390,9 +387,7 @@ namespace Lab2
         void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (UpToDate) return;
-            var isSave = MessageBox.Show("You have unsaved changes, they will be lost if you" +
-                " close the application. Save changes?", "Danger", MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
+            var isSave = MessageBox.Show("Save changes?", "", MessageBoxButtons.YesNo);
             if (isSave == DialogResult.Yes)
             {
                 Save.PerformClick();
