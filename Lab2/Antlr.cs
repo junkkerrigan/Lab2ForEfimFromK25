@@ -81,7 +81,7 @@ namespace Lab2
                 if (r == 0)
                 {
                     var ex = new Exception();
-                    ex.Data.Add("Type", "division by 0");
+                    ex.Data.Add("Type", "div on 0");
                     throw ex;
                 }
                 ans = l / r;
@@ -96,7 +96,7 @@ namespace Lab2
             if (r == 0)
             {
                 var ex = new DivideByZeroException();
-                ex.Data.Add("Type", "modulo by zero");
+                ex.Data.Add("Type", "mod on 0");
                 throw ex;
             }
             int ans = l % r;
@@ -110,13 +110,13 @@ namespace Lab2
             if (r < 0)
             {
                 var ex = new ArgumentOutOfRangeException();
-                ex.Data.Add("Type", "negative power");
+                ex.Data.Add("Type", "negative value of power");
                 throw ex;
             }
             if (r == 0 && l == 0)
             {
                 var ex = new ArgumentOutOfRangeException();
-                ex.Data.Add("Type", "0^0");
+                ex.Data.Add("Type", "null in null power");
                 throw ex;
             }
             int ans = (int)Math.Pow(l, r);
@@ -149,7 +149,7 @@ namespace Lab2
                 if (cell.Visited)
                 {
                     var ex = new Exception();
-                    ex.Data.Add("Type", "reference loop");
+                    ex.Data.Add("Type", "cell loop");
                     throw ex;
                 }
                 cell.Connected.Add(CalculatingCell);

@@ -122,7 +122,7 @@ namespace Lab2
             AddMenuPanel();
             AddTable();
             Resize += MainWindow_SizeChanged;
-            FormClosed += MainWindow_FormClosed;
+            FormClosing += MainWindow_FormClosing;
         }
         void AddMenuPanel()
         {
@@ -384,14 +384,15 @@ namespace Lab2
             Table.Size = new Size(ClientSize.Width - 60,
                     ClientSize.Height - MenuPanel.Bottom - 60);
         }
-        void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
+        void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (UpToDate) return;
-            var isSave = MessageBox.Show("Save changes?", "", MessageBoxButtons.YesNo);
+            var isSave = MessageBox.Show("Save changes?", "", MessageBoxButtons.YesNoCancel);
             if (isSave == DialogResult.Yes)
             {
                 Save.PerformClick();
             }
+            else if (isSave == DialogResult.Cancel) e.Cancel = true;
         }
     }
 }
