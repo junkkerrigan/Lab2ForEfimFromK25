@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -25,6 +26,7 @@ namespace Lab2
             AddColumns(cols);
             AddRows(rows);
             RowHeadersWidth = 60;
+            DefaultCellStyle.Font = new Font("Times New Roman", 12);
             ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             RowHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         }

@@ -110,15 +110,13 @@ namespace Lab2
     {
         public TableView Table { get; set; }
         bool UpToDate = true;
-        MenuStrip MainMenu;
-        ToolStripMenuItem Save, Open;
         TextBox ExpressionInCell;
         Panel Toolbar;
-        Button AddRow, AddCol, DelRow, DelCol;
+        Label Rows, Cols;
+        Button AddRow, AddCol, DelRow, DelCol, Save, Open;
         public MainWindow()
         {
             InitializeComponent();
-            AddMainMenu();
             AddToolbar();
             AddTable();
             Resize += MainWindow_Resize;
@@ -138,11 +136,12 @@ namespace Lab2
         void MainWindow_Resize(object sender, EventArgs e)
         {
             Toolbar.Width = ClientSize.Width - 120;
-            AddCol.Location = new Point(
-                    Math.Max(330, (Toolbar.Width - 270) / 2), 5);
-            DelCol.Location = new Point(AddCol.Bounds.Right + 30, 5);
-            AddRow.Location = new Point(DelCol.Bounds.Right + 30, 5);
-            DelRow.Location = new Point(AddRow.Bounds.Right + 30, 5);
+            Rows.Location = new Point(Math.Max(330, (Toolbar.Width - 300) / 2), 10);
+            AddRow.Location = new Point(Rows.Right, 5);
+            DelRow.Location = new Point(AddRow.Right + 10, 5);
+            Cols.Location = new Point(DelRow.Right + 40, 10);
+            AddCol.Location = new Point(Cols.Right, 5);
+            DelCol.Location = new Point(AddCol.Right + 10, 5);
             Table.Size = new Size(ClientSize.Width - 60,
                     ClientSize.Height - Toolbar.Bottom - 60);
         }
@@ -150,7 +149,7 @@ namespace Lab2
         {
             if (existing == null)
             {
-                Table = new TableView(10, 10)
+                Table = new TableView(30, 20)
                 {
                     Location = new Point(30, Toolbar.Bottom + 30),
                     Size = new Size(ClientSize.Width - 60,
@@ -216,12 +215,13 @@ namespace Lab2
         {
             Toolbar = new Panel()
             {
-                Location = new Point(60, MainMenu.Bottom + 30),
-                Size = new Size(ClientSize.Width - 120, 40),
+                Location = new Point(60, 60),
+                Size = new Size(ClientSize.Width - 120, 80),
             };
+            AddFileButtons();
             ExpressionInCell = new TextBox()
             {
-                Location = new Point(0, 0),
+                Location = new Point(Open.Right + 50, 0),
                 Font = new Font("Times New Roman", 16),
                 Width = 300,
             };
@@ -252,94 +252,18 @@ namespace Lab2
                 UpToDate = false;
             };
             Toolbar.Controls.Add(ExpressionInCell);
-            AddButtons();
+            AddTableButtons();
             Controls.Add(Toolbar);
         }
-        void AddButtons()
+        void AddFileButtons()
         {
-            AddCol = new Button()
+            Save = new Button()
             {
-                Text = "Add column",
-                Location = new Point(
-                    Math.Max(330, (Toolbar.Width - 270) / 2), 5),
-                Size = new Size(120, 30),
+                Location = new Point(0, 5),
+                Size = new Size(80, 30),
+                Text = "Save",
+                Font = new Font("Times New Roman", 12),
             };
-            AddCol.Click += (s, e) => Table.AddColumns(1);
-
-            DelCol = new Button()
-            {
-                Text = "Delete column",
-                Location = new Point(AddCol.Bounds.Right + 30, 5),
-                Size = new Size(120, 30),
-            };
-            DelCol.Click += (s, e) =>
-            {
-                string input = Prompt.ShowDialog("Enter title of column to delete:", "");
-                if (input == "") return;
-                try
-                {
-                    Table.DeleteColumn(input);
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    MessageBox.Show("Invalid title of column", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                catch
-                {
-                    MessageBox.Show("Invalid input", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            };
-
-            AddRow = new Button()
-            {
-                Text = "Add row",
-                Location = new Point(DelCol.Bounds.Right + 30, 5),
-                Size = new Size(120, 30),
-            };
-            AddRow.Click += (s, e) => Table.AddRows(1);
-
-            DelRow = new Button()
-            {
-                Text = "Delete row",
-                Location = new Point(AddRow.Bounds.Right + 30, 5),
-                Size = new Size(120, 30),
-            };
-            DelRow.Click += (s, e) =>
-            {
-                string input = Prompt.ShowDialog("Enter number of column to delete:", "");
-                if (input == "") return;
-                try
-                {
-                    int num = Convert.ToInt32(input);
-                    Table.DeleteRow(num);
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    MessageBox.Show("Invalid number of row", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                catch
-                {
-                    MessageBox.Show("Invalid input", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            };
-            Toolbar.Controls.Add(AddCol);
-            Toolbar.Controls.Add(DelCol);
-            Toolbar.Controls.Add(AddRow);
-            Toolbar.Controls.Add(DelRow);
-        }
-        void AddMainMenu()
-        {
-            MainMenu = new MenuStrip()
-            {
-                BackColor = this.BackColor,
-                Font = new Font("Times New Roman", 12)
-            };
-            var file = new ToolStripMenuItem("File");
-            Save = new ToolStripMenuItem("Save to");
             Save.Click += (s, e) =>
             {
                 var saveTo = new SaveFileDialog()
@@ -352,7 +276,13 @@ namespace Lab2
                 }
                 UpToDate = true;
             };
-            Open = new ToolStripMenuItem("Open from");
+            Open = new Button()
+            {
+                Location = new Point(Save.Right + 15, 5),
+                Size = new Size(80, 30),
+                Text = "Open",
+                Font = new Font("Times New Roman", 12),
+            };
             Open.Click += (s, e) =>
             {
                 var openFrom = new OpenFileDialog()
@@ -374,10 +304,97 @@ namespace Lab2
                     }
                 }
             };
-            file.DropDownItems.Add(Save);
-            file.DropDownItems.Add(Open);
-            MainMenu.Items.Add(file);
-            Controls.Add(MainMenu);
+            Toolbar.Controls.Add(Save);
+            Toolbar.Controls.Add(Open);
+        }
+        void AddTableButtons()
+        {
+            Rows = new Label()
+            {
+                Location = new Point(
+                    Math.Max(380, (Toolbar.Width - 300) / 2), 10),
+                Text = "Rows:",
+                Font = new Font("Times New Roman", 12),
+                Size = new Size(70, 30),
+            };
+            AddRow = new Button()
+            {
+                Text = "+",
+                Location = new Point(Rows.Right, 5),
+                Size = new Size(30, 30),
+            };
+            AddRow.Click += (s, e) => Table.AddRows(1);
+            DelRow = new Button()
+            {
+                Text = "-",
+                Location = new Point(AddRow.Right + 10, 5),
+                Size = new Size(30, 30),
+            };
+            DelRow.Click += (s, e) =>
+            {
+                string input = Prompt.ShowDialog("Enter number of row to delete:", "");
+                if (input == "") return;
+                try
+                {
+                    int num = Convert.ToInt32(input);
+                    Table.DeleteRow(num);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    MessageBox.Show("Invalid number of row", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch
+                {
+                    MessageBox.Show("Invalid input", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+            Cols = new Label()
+            {
+                Location = new Point(DelRow.Right + 40, 10),
+                Text = "Columns:",
+                Font = new Font("Times New Roman", 12),
+                Size = new Size(100, 30),
+            };
+            AddCol = new Button()
+            {
+                Text = "+",
+                Location = new Point(Cols.Right, 5),
+                Size = new Size(30, 30),
+            };
+            AddCol.Click += (s, e) => Table.AddColumns(1);
+            DelCol = new Button()
+            {
+                Text = "-",
+                Location = new Point(AddCol.Right + 10, 5),
+                Size = new Size(30, 30),
+            };
+            DelCol.Click += (s, e) =>
+            {
+                string input = Prompt.ShowDialog("Enter name of column to delete:", "");
+                if (input == "") return;
+                try
+                {
+                    Table.DeleteColumn(input);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    MessageBox.Show("Invalid name of column", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch
+                {
+                    MessageBox.Show("Invalid input", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+            Toolbar.Controls.Add(Rows);
+            Toolbar.Controls.Add(AddRow);
+            Toolbar.Controls.Add(DelRow);
+            Toolbar.Controls.Add(Cols);
+            Toolbar.Controls.Add(AddCol);
+            Toolbar.Controls.Add(DelCol);
         }
     }
 }
