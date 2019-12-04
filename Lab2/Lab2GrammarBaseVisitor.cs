@@ -44,17 +44,6 @@ public partial class Lab2GrammarBaseVisitor<Result> : AbstractParseTreeVisitor<R
 	/// <return>The visitor result.</return>
 	public virtual Result VisitUnit([NotNull] Lab2GrammarParser.UnitContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Rest</c>
-	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
-	/// <para>
-	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
-	/// on <paramref name="context"/>.
-	/// </para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	public virtual Result VisitRest([NotNull] Lab2GrammarParser.RestContext context) { return VisitChildren(context); }
-	/// <summary>
 	/// Visit a parse tree produced by the <c>Dec</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// <para>
@@ -121,7 +110,7 @@ public partial class Lab2GrammarBaseVisitor<Result> : AbstractParseTreeVisitor<R
 	/// <return>The visitor result.</return>
 	public virtual Result VisitMultiplicationOrDivision([NotNull] Lab2GrammarParser.MultiplicationOrDivisionContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>CellPos</c>
+	/// Visit a parse tree produced by the <c>CellRef</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -130,7 +119,7 @@ public partial class Lab2GrammarBaseVisitor<Result> : AbstractParseTreeVisitor<R
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitCellPos([NotNull] Lab2GrammarParser.CellPosContext context) { return VisitChildren(context); }
+	public virtual Result VisitCellRef([NotNull] Lab2GrammarParser.CellRefContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Power</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
@@ -164,4 +153,15 @@ public partial class Lab2GrammarBaseVisitor<Result> : AbstractParseTreeVisitor<R
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitInc([NotNull] Lab2GrammarParser.IncContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Invalid</c>
+	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitInvalid([NotNull] Lab2GrammarParser.InvalidContext context) { return VisitChildren(context); }
 }

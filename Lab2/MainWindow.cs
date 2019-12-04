@@ -70,9 +70,9 @@ namespace Lab2
         }
     }
 
-    public static class Converter
+    public static class Sys26
     {
-        public static string NumberToColumnTitle(int num)
+        public static string NumToSys26(int num)
         {
             string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             string title = "";
@@ -93,34 +93,18 @@ namespace Lab2
             }
             return title;
         }
-
-        public static int ColumnTitleToNumber(string title)
+        public static int Sys26ToNum(string inSys26)
         {
             string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             int num = 0, pow = 1;
-            for (int i = title.Length - 1; i >= 0; i--)
+            for (int i = inSys26.Length - 1; i >= 0; i--)
             {
-                num += (alphabet.IndexOf(title[i]) + 1) * pow;
+                num += (alphabet.IndexOf(inSys26[i]) + 1) * pow;
                 pow *= 26;
             }
             return num;
         }
     }
-
-    public class MyParsErrListener : IAntlrErrorListener<IToken>
-    {
-        public void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
-        {
-            console.log("SE");
-            throw new Exception();
-        }
-    }
-
-    
-
-        
-
-    
 
     public partial class MainWindow : Form
     {
@@ -131,18 +115,16 @@ namespace Lab2
         TextBox ExpressionInCell;
         Panel Toolbar;
         Button AddRow, AddCol, DelRow, DelCol;
-
         public MainWindow()
         {
             InitializeComponent();
-            InitializeMainMenu();
-            InitializeToolbar();
-            InitializeTable();
+            AddMainMenu();
+            AddToolbar();
+            AddTable();
             Resize += MainWindow_Resize;
             FormClosed += MainWindow_FormClosed;
         }
-
-        private void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
+        void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (UpToDate) return;
             var isSave = MessageBox.Show("You have unsaved changes, they will be lost if you" +
@@ -153,8 +135,7 @@ namespace Lab2
                 Save.PerformClick();
             }
         }
-
-        private void MainWindow_Resize(object sender, EventArgs e)
+        void MainWindow_Resize(object sender, EventArgs e)
         {
             Toolbar.Width = ClientSize.Width - 120;
             AddCol.Location = new Point(
@@ -165,8 +146,7 @@ namespace Lab2
             Table.Size = new Size(ClientSize.Width - 60,
                     ClientSize.Height - Toolbar.Bottom - 60);
         }
-
-        void InitializeTable(TableView existing = null)
+        void AddTable(TableView existing = null)
         {
             if (existing == null)
             {
@@ -189,15 +169,15 @@ namespace Lab2
 
             Table.CellEnter += (s, e) =>
             {
-                CellView selected = Table.GetCell(e.RowIndex, e.ColumnIndex) as CellView;
-                ExpressionInCell.Text = Table.GetCell(e.RowIndex, e.ColumnIndex).Expression;
+                CellView selected = Table.Cell(e.RowIndex, e.ColumnIndex) as CellView;
+                ExpressionInCell.Text = Table.Cell(e.RowIndex, e.ColumnIndex).Expression;
             };
             Table.CellBeginEdit += (s, e) =>
             {
                 try
                 {
-                    Table.SelectedCell.Value = ExpressionInCell.Text =
-                        Table.GetExpressionInCell(e.RowIndex, e.ColumnIndex);
+                    Table.CurCell.Value = ExpressionInCell.Text =
+                        Table.Cell(e.RowIndex, e.ColumnIndex).Expression;
                 }
                 catch (IndexOutOfRangeException)
                 {
@@ -205,7 +185,7 @@ namespace Lab2
             };
             Table.CellEndEdit += (s, e) =>
             {
-                CellView changed = Table.GetCell(e.RowIndex, e.ColumnIndex);
+                CellView changed = Table.Cell(e.RowIndex, e.ColumnIndex);
                 string oldExpr = changed.Expression;
                 changed.Expression = (string)changed.Value;
                 try
@@ -232,8 +212,7 @@ namespace Lab2
             Controls.Add(Table);
             Table.ResumeLayout();
         }
-
-        void InitializeToolbar()
+        void AddToolbar()
         {
             Toolbar = new Panel()
             {
@@ -248,12 +227,12 @@ namespace Lab2
             };
             ExpressionInCell.Leave += (s, e) =>
             {
-                if (Table.SelectedCell == null) return;
-                string oldExpr = Table.SelectedCell.Expression;
-                Table.SelectedCell.Expression = ExpressionInCell.Text;
+                if (Table.CurCell == null) return;
+                string oldExpr = Table.CurCell.Expression;
+                Table.CurCell.Expression = ExpressionInCell.Text;
                 try
                 {
-                    Table.Recalculate(Table.SelectedCell);
+                    Table.Recalculate(Table.CurCell);
                 }
                 catch (Exception ex)
                 {
@@ -267,17 +246,16 @@ namespace Lab2
                         MessageBox.Show($"Invalid expression",
                             "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    Table.SelectedCell.Expression = oldExpr;
-                    Table.Recalculate(Table.SelectedCell);
+                    Table.CurCell.Expression = oldExpr;
+                    Table.Recalculate(Table.CurCell);
                 }
                 UpToDate = false;
             };
             Toolbar.Controls.Add(ExpressionInCell);
-            InitializeButtons();
+            AddButtons();
             Controls.Add(Toolbar);
         }
-
-        void InitializeButtons()
+        void AddButtons()
         {
             AddCol = new Button()
             {
@@ -286,7 +264,7 @@ namespace Lab2
                     Math.Max(330, (Toolbar.Width - 270) / 2), 5),
                 Size = new Size(120, 30),
             };
-            AddCol.Click += (s, e) => Table.AddColumn();
+            AddCol.Click += (s, e) => Table.AddColumns(1);
 
             DelCol = new Button()
             {
@@ -320,7 +298,7 @@ namespace Lab2
                 Location = new Point(DelCol.Bounds.Right + 30, 5),
                 Size = new Size(120, 30),
             };
-            AddRow.Click += (s, e) => Table.AddRow();
+            AddRow.Click += (s, e) => Table.AddRows(1);
 
             DelRow = new Button()
             {
@@ -353,8 +331,7 @@ namespace Lab2
             Toolbar.Controls.Add(AddRow);
             Toolbar.Controls.Add(DelRow);
         }
-
-        void InitializeMainMenu()
+        void AddMainMenu()
         {
             MainMenu = new MenuStrip()
             {
@@ -386,7 +363,7 @@ namespace Lab2
                 {
                     try
                     {
-                        InitializeTable(
+                        AddTable(
                             TableView.CreateFromSerialized(
                                 File.ReadAllText(openFrom.FileName)));
                     }
@@ -402,6 +379,5 @@ namespace Lab2
             MainMenu.Items.Add(file);
             Controls.Add(MainMenu);
         }
-
     }
 }

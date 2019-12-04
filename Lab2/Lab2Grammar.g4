@@ -16,8 +16,8 @@ expr
 	| expr operatorToken=(ADDITION|SUBTRACTION) expr #AdditionOrSubtraction
 	| expr MOD expr #Mod
 	| NUM #Num
-	| CELLPOS #CellPos
-	| SYMBOL #Rest
+	| CELLREF #CellRef
+	| INVALID #Invalid
 	;
 
 /*
@@ -26,7 +26,7 @@ expr
 
 LBRACKET : '(';
 RBRACKET : ')';
-CELLPOS : ('A'..'Z')+ NUM;
+CELLREF : ('A'..'Z')+ NUM;
 POWER : '^';
 MULTIPLICATION : '*';
 INC : 'inc';
@@ -37,4 +37,4 @@ SUBTRACTION : '-';
 MOD : ' mod ';
 NUM : ('0'..'9')+;
 WHITESPACE : (' ' | '\t')+ -> skip;
-SYMBOL : .;
+INVALID : .;

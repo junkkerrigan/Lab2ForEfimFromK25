@@ -7,22 +7,26 @@ namespace Lab2
 {
     public class AntlrVisitor : Lab2GrammarBaseVisitor<int>
     {
-        CellView Evaluating;
-        TableView Table;
-        HashSet<string> UsedCells;
-        public AntlrVisitor(TableView table, HashSet<string> usedCells, CellView evaluating) : base()
+        CellView CalculatingCell;
+        int LeftOperand(Lab2GrammarParser.ExprContext context)
         {
-            Table = table;
-            Evaluating = evaluating;
-            UsedCells = usedCells;
-            console.log($"Evaluating: {evaluating}");
+            return Visit(context.GetRuleContext<Lab2GrammarParser.ExprContext>(0));
+        }
+        int RightOperand(Lab2GrammarParser.ExprContext context)
+        {
+            return Visit(context.GetRuleContext<Lab2GrammarParser.ExprContext>(1));
+        }
+        public AntlrVisitor(CellView calculating) : base()
+        {
+            CalculatingCell = calculating;
+            console.log($"CalculatingCell: {calculating}");
             console.log("Dependecies:");
-            foreach (var d in evaluating.Dependencies)
+            foreach (var d in calculating.Connections)
             {
                 console.log(d);
             }
-            console.log("Depended:");
-            foreach (var d in evaluating.Depended)
+            console.log("Connected:");
+            foreach (var d in calculating.Connected)
             {
                 console.log(d);
             }
@@ -131,29 +135,29 @@ namespace Lab2
             console.log($"neg {ans}");
             return ans;
         }
-        public override int VisitCellPos([NotNull] Lab2GrammarParser.CellPosContext context)
+        public override int VisitCellRef([NotNull] Lab2GrammarParser.CellRefContext context)
         {
             try
             {
-                string cellPosition = context.GetText();
-                if (UsedCells.Contains(cellPosition))
+                string cellRef = context.GetText();
+                int column = 0;
+                while (65 <= (int)cellRef[column] && (int)cellRef[column] <= 90)
+                    column++;
+                int colNum = Sys26.Sys26ToNum(cellRef.Substring(0, column)) - 1;
+                int rowNum = int.Parse(cellRef.Substring(column)) - 1;
+                CellView cell = CalculatingCell.Table.Cell(rowNum, colNum);
+                if (cell.Visited)
                 {
                     var ex = new Exception();
                     ex.Data.Add("Type", "reference loop");
                     throw ex;
                 }
-                UsedCells.Add(cellPosition);
-                int titleLen = 0;
-                while (65 <= (int)cellPosition[titleLen] && (int)cellPosition[titleLen] <= 90)
-                    titleLen++;
-                int colNum = Converter.ColumnTitleToNumber(cellPosition.Substring(0, titleLen)) - 1;
-                int rowNum = int.Parse(cellPosition.Substring(titleLen)) - 1;
-                CellView cell = Table.GetCell(rowNum, colNum);
-                cell.Depended.Add(Evaluating);
-                Evaluating.Dependencies.Add(cell);
-                int ans = cell.EvaluateExpression(UsedCells);
-                UsedCells.Remove(cellPosition);
-                console.log($"{cellPosition} {ans}");
+                cell.Connected.Add(CalculatingCell);
+                CalculatingCell.Connections.Add(cell);
+                cell.Visited = true;
+                int ans = cell.Evaluate();
+                cell.Visited = false;
+                console.log($"{cellRef} {ans}");
                 return ans;
             }
             catch
@@ -161,7 +165,7 @@ namespace Lab2
                 throw;
             }
         }
-        public override int VisitRest([NotNull] Lab2GrammarParser.RestContext context)
+        public override int VisitInvalid([NotNull] Lab2GrammarParser.InvalidContext context)
         {
             throw new Exception();
         }
@@ -176,14 +180,6 @@ namespace Lab2
             int ans = Visit(context.expr()) - 1;
             console.log($"dic {ans}");
             return ans;
-        }
-        private int LeftOperand(Lab2GrammarParser.ExprContext context)
-        {
-            return Visit(context.GetRuleContext<Lab2GrammarParser.ExprContext>(0));
-        }
-        private int RightOperand(Lab2GrammarParser.ExprContext context)
-        {
-            return Visit(context.GetRuleContext<Lab2GrammarParser.ExprContext>(1));
         }
     }
 }

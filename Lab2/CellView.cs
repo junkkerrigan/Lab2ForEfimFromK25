@@ -8,19 +8,21 @@ namespace Lab2
 {
     public class CellView : DataGridViewTextBoxCell
     {
-        public string Expression { get; set; } = "";
-
-        public bool Recalculated { get; set; } = false;
-
-        public HashSet<CellView> Depended { get; set; } = new HashSet<CellView>();
-
-        public HashSet<CellView> Dependencies { get; set; } = new HashSet<CellView>();
-
         public CellView() : base()
         {
         }
-
-        public int EvaluateExpression(HashSet<string> usedCells)
+        public TableView Table { 
+            get
+            {
+                return DataGridView as TableView;
+            }
+        }
+        public bool Visited { get; set; } = false;
+        public string Expression { get; set; } = "";
+        public bool Recalculated { get; set; } = false;
+        public HashSet<CellView> Connections { get; set; } = new HashSet<CellView>();
+        public HashSet<CellView> Connected { get; set; } = new HashSet<CellView>();
+        public int Evaluate()
         {
             if (Expression == "")
             {
@@ -41,9 +43,7 @@ namespace Lab2
                 parser.RemoveErrorListeners();
                 parser.AddErrorListener(new MyParsErrListener());
                 var expr = parser.unit();
-                int val =
-                    (new AntlrVisitor(DataGridView as TableView, usedCells, this))
-                    .Visit(expr);
+                int val = (new AntlrVisitor(this)).Visit(expr);
                 Recalculated = true;
                 return val;
             }
@@ -52,7 +52,6 @@ namespace Lab2
                 throw;
             }
         }
-
         public override object Clone()
         {
             var clone = base.Clone() as CellView;

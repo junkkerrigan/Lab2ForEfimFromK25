@@ -36,8 +36,8 @@ public partial class Lab2GrammarParser : Parser {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		LBRACKET=1, RBRACKET=2, CELLPOS=3, POWER=4, MULTIPLICATION=5, INC=6, DEC=7, 
-		DIV=8, ADDITION=9, SUBTRACTION=10, MOD=11, NUM=12, WHITESPACE=13, SYMBOL=14;
+		LBRACKET=1, RBRACKET=2, CELLREF=3, POWER=4, MULTIPLICATION=5, INC=6, DEC=7, 
+		DIV=8, ADDITION=9, SUBTRACTION=10, MOD=11, NUM=12, WHITESPACE=13, INVALID=14;
 	public const int
 		RULE_unit = 0, RULE_expr = 1;
 	public static readonly string[] ruleNames = {
@@ -49,8 +49,8 @@ public partial class Lab2GrammarParser : Parser {
 		"'-'", "' mod '"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, "LBRACKET", "RBRACKET", "CELLPOS", "POWER", "MULTIPLICATION", "INC", 
-		"DEC", "DIV", "ADDITION", "SUBTRACTION", "MOD", "NUM", "WHITESPACE", "SYMBOL"
+		null, "LBRACKET", "RBRACKET", "CELLREF", "POWER", "MULTIPLICATION", "INC", 
+		"DEC", "DIV", "ADDITION", "SUBTRACTION", "MOD", "NUM", "WHITESPACE", "INVALID"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -141,23 +141,6 @@ public partial class Lab2GrammarParser : Parser {
 		public ExprContext() { }
 		public virtual void CopyFrom(ExprContext context) {
 			base.CopyFrom(context);
-		}
-	}
-	public partial class RestContext : ExprContext {
-		public ITerminalNode SYMBOL() { return GetToken(Lab2GrammarParser.SYMBOL, 0); }
-		public RestContext(ExprContext context) { CopyFrom(context); }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILab2GrammarListener typedListener = listener as ILab2GrammarListener;
-			if (typedListener != null) typedListener.EnterRest(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILab2GrammarListener typedListener = listener as ILab2GrammarListener;
-			if (typedListener != null) typedListener.ExitRest(this);
-		}
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			ILab2GrammarVisitor<TResult> typedVisitor = visitor as ILab2GrammarVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitRest(this);
-			else return visitor.VisitChildren(this);
 		}
 	}
 	public partial class DecContext : ExprContext {
@@ -293,20 +276,20 @@ public partial class Lab2GrammarParser : Parser {
 			else return visitor.VisitChildren(this);
 		}
 	}
-	public partial class CellPosContext : ExprContext {
-		public ITerminalNode CELLPOS() { return GetToken(Lab2GrammarParser.CELLPOS, 0); }
-		public CellPosContext(ExprContext context) { CopyFrom(context); }
+	public partial class CellRefContext : ExprContext {
+		public ITerminalNode CELLREF() { return GetToken(Lab2GrammarParser.CELLREF, 0); }
+		public CellRefContext(ExprContext context) { CopyFrom(context); }
 		public override void EnterRule(IParseTreeListener listener) {
 			ILab2GrammarListener typedListener = listener as ILab2GrammarListener;
-			if (typedListener != null) typedListener.EnterCellPos(this);
+			if (typedListener != null) typedListener.EnterCellRef(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			ILab2GrammarListener typedListener = listener as ILab2GrammarListener;
-			if (typedListener != null) typedListener.ExitCellPos(this);
+			if (typedListener != null) typedListener.ExitCellRef(this);
 		}
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILab2GrammarVisitor<TResult> typedVisitor = visitor as ILab2GrammarVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitCellPos(this);
+			if (typedVisitor != null) return typedVisitor.VisitCellRef(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -370,6 +353,23 @@ public partial class Lab2GrammarParser : Parser {
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ILab2GrammarVisitor<TResult> typedVisitor = visitor as ILab2GrammarVisitor<TResult>;
 			if (typedVisitor != null) return typedVisitor.VisitInc(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class InvalidContext : ExprContext {
+		public ITerminalNode INVALID() { return GetToken(Lab2GrammarParser.INVALID, 0); }
+		public InvalidContext(ExprContext context) { CopyFrom(context); }
+		public override void EnterRule(IParseTreeListener listener) {
+			ILab2GrammarListener typedListener = listener as ILab2GrammarListener;
+			if (typedListener != null) typedListener.EnterInvalid(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			ILab2GrammarListener typedListener = listener as ILab2GrammarListener;
+			if (typedListener != null) typedListener.ExitInvalid(this);
+		}
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILab2GrammarVisitor<TResult> typedVisitor = visitor as ILab2GrammarVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitInvalid(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -444,20 +444,20 @@ public partial class Lab2GrammarParser : Parser {
 				State = 24; Match(NUM);
 				}
 				break;
-			case CELLPOS:
+			case CELLREF:
 				{
-				_localctx = new CellPosContext(_localctx);
+				_localctx = new CellRefContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 25; Match(CELLPOS);
+				State = 25; Match(CELLREF);
 				}
 				break;
-			case SYMBOL:
+			case INVALID:
 				{
-				_localctx = new RestContext(_localctx);
+				_localctx = new InvalidContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 26; Match(SYMBOL);
+				State = 26; Match(INVALID);
 				}
 				break;
 			default:

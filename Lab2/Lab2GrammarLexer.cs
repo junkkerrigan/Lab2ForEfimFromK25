@@ -33,8 +33,8 @@ public partial class Lab2GrammarLexer : Lexer {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		LBRACKET=1, RBRACKET=2, CELLPOS=3, POWER=4, MULTIPLICATION=5, INC=6, DEC=7, 
-		DIV=8, ADDITION=9, SUBTRACTION=10, MOD=11, NUM=12, WHITESPACE=13, SYMBOL=14;
+		LBRACKET=1, RBRACKET=2, CELLREF=3, POWER=4, MULTIPLICATION=5, INC=6, DEC=7, 
+		DIV=8, ADDITION=9, SUBTRACTION=10, MOD=11, NUM=12, WHITESPACE=13, INVALID=14;
 	public static string[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -44,8 +44,8 @@ public partial class Lab2GrammarLexer : Lexer {
 	};
 
 	public static readonly string[] ruleNames = {
-		"LBRACKET", "RBRACKET", "CELLPOS", "POWER", "MULTIPLICATION", "INC", "DEC", 
-		"DIV", "ADDITION", "SUBTRACTION", "MOD", "NUM", "WHITESPACE", "SYMBOL"
+		"LBRACKET", "RBRACKET", "CELLREF", "POWER", "MULTIPLICATION", "INC", "DEC", 
+		"DIV", "ADDITION", "SUBTRACTION", "MOD", "NUM", "WHITESPACE", "INVALID"
 	};
 
 
@@ -63,8 +63,8 @@ public partial class Lab2GrammarLexer : Lexer {
 		"'-'", "' mod '"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, "LBRACKET", "RBRACKET", "CELLPOS", "POWER", "MULTIPLICATION", "INC", 
-		"DEC", "DIV", "ADDITION", "SUBTRACTION", "MOD", "NUM", "WHITESPACE", "SYMBOL"
+		null, "LBRACKET", "RBRACKET", "CELLREF", "POWER", "MULTIPLICATION", "INC", 
+		"DEC", "DIV", "ADDITION", "SUBTRACTION", "MOD", "NUM", "WHITESPACE", "INVALID"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 

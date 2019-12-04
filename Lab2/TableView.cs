@@ -7,76 +7,65 @@ using Antlr4.Runtime;
 
 namespace Lab2
 {
+    public class MyParsErrListener : IAntlrErrorListener<IToken>
+    {
+        public void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+        {
+            console.log("SE");
+            throw new Exception();
+        }
+    }
+
     public class TableView : DataGridView
     {
-        int N = 0;
-        int M = 0;
-
-        public CellView SelectedCell
-        {
-            get
-            {
-                if (SelectedCells.Count == 0) return null;
-                return SelectedCells[SelectedCells.Count - 1] as CellView;
-            }
-        }
-
-        public TableView() : this(0, 0)
-        {
-        }
-
-        public TableView(int n, int m) : base()
+        public TableView(int rows, int cols) : base()
         {
             AllowUserToAddRows = false;
             MultiSelect = false;
-            AddColumn(m);
-            AddRow(n);
+            AddColumns(cols);
+            AddRows(rows);
             RowHeadersWidth = 60;
             ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             RowHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         }
-
-        public void AddRow(int num = 1)
+        public CellView CurCell
         {
-            for (int i = 0; i < num; i++)
+            get
             {
-                N++;
+                if (SelectedCells.Count == 0) return null;
+                return SelectedCells[0] as CellView;
+            }
+        }
+        public CellView Cell(int rNum, int cNum)
+        {
+            return Rows[rNum].Cells[cNum] as CellView;
+        }
+        public void AddRows(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
                 DataGridViewRow row = new DataGridViewRow();
-                row.HeaderCell.Value = N.ToString();
+                row.HeaderCell.Value = (RowCount + 1).ToString();
                 Rows.Add(row);
             }
         }
-
-        public void AddColumn(int num = 1)
+        public void AddColumns(int cnt)
         {
-            for (int i = 0; i < num; i++)
+            for (int i = 0; i < cnt; i++)
             {
-                M++;
                 DataGridViewColumn col = new DataGridViewColumn(new CellView());
-                col.HeaderCell.Value = Converter.NumberToColumnTitle(M);
+                col.HeaderCell.Value = Sys26.NumToSys26(ColumnCount + 1);
                 Columns.Add(col);
             }
         }
-
-        private void ResetDepended(CellView cur)
-        {
-            cur.Value = cur.Expression = "";
-            foreach (var d in cur.Depended)
-            {
-                ResetDepended(d);
-            }
-            cur.Depended.Clear();
-            cur.Dependencies.Clear();
-        }
-
         public void DeleteRow(int idx)
         {
             idx--;
             bool canDelete = true;
-            for (int i = 0; i < M; i++)
+            for (int i = 0; i < ColumnCount; i++)
             {
-                var cell = GetCell(idx, i);
-                foreach (var d in cell.Depended)
+                var cell = Cell(idx, i);
+                foreach (var d in cell.Connected)
                 {
                     if (d.RowIndex == idx) continue;
                     canDelete = false;
@@ -85,9 +74,8 @@ namespace Lab2
             }
             if (canDelete)
             {
-                ShiftRowTitles(idx);
+                RestoreRowTitles(idx);
                 Rows.RemoveAt(idx);
-                N--;
                 return;
             }
             var isDelete = MessageBox.Show("If you delete this row, some cells" +
@@ -96,38 +84,28 @@ namespace Lab2
             if (isDelete == DialogResult.No) return;
             try
             {
-                for (int i = 0; i < M; i++)
+                for (int i = 0; i < Columns.Count; i++)
                 {
-                    var cell = GetCell(idx, i);
-                    ResetDepended(cell);
+                    var cell = Cell(idx, i);
+                    EmptyConnections(cell);
                 }
-                ShiftRowTitles(idx);
+                RestoreRowTitles(idx);
                 Rows.RemoveAt(idx);
-                N--;
             }
             catch (Exception ex)
             {
                 console.log($"in DelRow: {ex.Message}");
             }
         }
-
-        private void ShiftRowTitles(int to)
+        public void DeleteColumn(string name)
         {
-            for (int i = N - 1; i > to; i--)
-            {
-                Rows[i].HeaderCell.Value = Rows[i - 1].HeaderCell.Value;
-            }
-        }
-
-        public void DeleteColumn(string title)
-        {
-            int idx = Converter.ColumnTitleToNumber(title);
+            int idx = Sys26.Sys26ToNum(name);
             idx--;
             bool canDelete = true;
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < RowCount; i++)
             {
-                var cell = GetCell(i, idx);
-                foreach (var d in cell.Depended)
+                var cell = Cell(i, idx);
+                foreach (var d in cell.Connected)
                 {
                     if (d.ColumnIndex == idx) continue;
                     canDelete = false;
@@ -136,9 +114,8 @@ namespace Lab2
             }
             if (canDelete)
             {
-                ShiftColTitles(idx);
+                RestoreColTitles(idx);
                 Columns.RemoveAt(idx);
-                M--;
                 return;
             }
             var isDelete = MessageBox.Show("If you delete this column, some cells" +
@@ -147,79 +124,78 @@ namespace Lab2
             if (isDelete == DialogResult.No) return;
             try
             {
-                for (int i = 0; i < N; i++)
+                for (int i = 0; i < RowCount; i++)
                 {
-                    var cell = GetCell(i, idx);
-                    ResetDepended(cell);
+                    var cell = Cell(i, idx);
+                    EmptyConnections(cell);
                 }
-                ShiftColTitles(idx);
+                RestoreColTitles(idx);
                 Columns.RemoveAt(idx);
-                M--;
             }
             catch (Exception ex)
             {
                 console.log($"in DelCol: {ex.Message}");
             }
         }
-
-        private void ShiftColTitles(int to)
+        void RestoreRowTitles(int deleted)
         {
-            for (int i = M - 1; i > to; i--)
+            for (int i = RowCount - 1; i > deleted; i--)
+            {
+                Rows[i].HeaderCell.Value = Rows[i - 1].HeaderCell.Value;
+            }
+        }
+        void RestoreColTitles(int deleted)
+        {
+            for (int i = ColumnCount - 1; i > deleted; i--)
             {
                 Columns[i].HeaderCell.Value = Columns[i - 1].HeaderCell.Value;
             }
         }
-
-        public CellView GetCell(int r, int c)
+        void ProcessCell(CellView cell)
         {
-            return Rows[r].Cells[c] as CellView;
-        }
-
-        private void ResetRecalculated()
-        {
-            foreach (DataGridViewRow r in Rows)
+            try
             {
-                foreach (CellView c in r.Cells)
-                {
-                    c.Recalculated = false;
-                }
+                var inputStream = new AntlrInputStream(cell.Expression);
+                var lexer = new Lab2GrammarLexer(inputStream);
+                var commonTokenStream = new CommonTokenStream(lexer);
+                var parser = new Lab2GrammarParser(commonTokenStream);
+                parser.RemoveErrorListeners();
+                parser.AddErrorListener(new MyParsErrListener());
+                var expr = parser.unit();
+                cell.Value = (new AntlrVisitor(cell)).Visit(expr);
+            }
+            catch
+            {
+                throw;
+            }
+            cell.Recalculated = true;
+            foreach (var dep in cell.Connected)
+            {
+                ProcessCell(dep);
             }
         }
-
-        public string GetExpressionInCell(int r, int c)
+        void EmptyConnections(CellView cur)
         {
-            if (r < 0 || c < 0) throw new IndexOutOfRangeException();
-            return (Rows[r].Cells[c] as CellView).Expression;
-        }
-
-        public TableView Clone()
-        {
-            TableView clone = new TableView(N, M);
-            for (int i = 0; i < Rows.Count; i++)
+            cur.Value = cur.Expression = "";
+            foreach (var d in cur.Connected)
             {
-                int Index = 0;
-                foreach (CellView cell in Rows[i].Cells)
-                {
-                    clone.Rows[i].Cells[Index] = cell.Clone() as CellView;
-                    Index++;
-                }
+                EmptyConnections(d);
             }
-            return clone;
+            cur.Connected.Clear();
+            cur.Connections.Clear();
         }
-
         public string Serialize()
         {
-            string data = $"{N} {M}\n";
-            for (int i = 0; i < N; i++)
+            string data = $"{RowCount} {ColumnCount}\n";
+            for (int i = 0; i < RowCount; i++)
             {
-                for (int j = 0; j < M; j++)
+                for (int j = 0; j < ColumnCount; j++)
                 {
-                    data += GetCell(i, j).Expression + '\n';
+                    data += Cell(i, j).Expression + '\n';
                 }
             }
             return data;
         }
-
         public static TableView CreateFromSerialized(string data)
         {
             try
@@ -234,16 +210,16 @@ namespace Lab2
                 {
                     for (int j = 0; j < m; j++)
                     {
-                        table.GetCell(i, j).Expression = reader.ReadLine();
-                        console.log($"in cell ({i},{j}) now {table.GetCell(i, j).Expression}");
+                        table.Cell(i, j).Expression = reader.ReadLine();
+                        console.log($"in cell ({i},{j}) now {table.Cell(i, j).Expression}");
                     }
                 }
                 for (int i = 0; i < n; i++)
                 {
                     for (int j = 0; j < m; j++)
                     {
-                        table.Recalculate(table.GetCell(i, j));
-                        console.log($"value of ({i},{j}) now {table.GetCell(i, j).Value}");
+                        table.Recalculate(table.Cell(i, j));
+                        console.log($"value of ({i},{j}) now {table.Cell(i, j).Value}");
                     }
                 }
                 return table;
@@ -253,49 +229,28 @@ namespace Lab2
                 throw;
             }
         }
-
-        private void CalculateCell(CellView cell)
+        public void Recalculate(CellView updated)
         {
-            try
+            foreach (DataGridViewRow r in Rows)
             {
-                var inputStream = new AntlrInputStream(cell.Expression);
-                var lexer = new Lab2GrammarLexer(inputStream);
-                var commonTokenStream = new CommonTokenStream(lexer);
-                var parser = new Lab2GrammarParser(commonTokenStream);
-                parser.RemoveErrorListeners();
-                parser.AddErrorListener(new MyParsErrListener());
-                var expr = parser.unit();
-                cell.Value =
-                    (new AntlrVisitor(this, new HashSet<string>(), cell))
-                    .Visit(expr);
+                foreach (CellView c in r.Cells)
+                {
+                    c.Recalculated = false;
+                }
             }
-            catch
+            foreach (var d in updated.Connections)
             {
-                throw;
+                d.Connected.Remove(updated);
             }
-            cell.Recalculated = true;
-            foreach (var dep in cell.Depended)
+            updated.Connections.Clear();
+            if (string.IsNullOrWhiteSpace(updated.Expression))
             {
-                CalculateCell(dep);
-            }
-        }
-
-        public void Recalculate(CellView changed)
-        {
-            ResetRecalculated();
-            foreach (var d in changed.Dependencies)
-            {
-                d.Depended.Remove(changed);
-            }
-            changed.Dependencies.Clear();
-            if (string.IsNullOrWhiteSpace(changed.Expression))
-            {
-                ResetDepended(changed);
+                EmptyConnections(updated);
                 return;
             }
             try
             {
-                CalculateCell(changed);
+                ProcessCell(updated);
             }
             catch
             {

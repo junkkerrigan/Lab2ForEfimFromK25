@@ -38,13 +38,6 @@ public interface ILab2GrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitUnit([NotNull] Lab2GrammarParser.UnitContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Rest</c>
-	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitRest([NotNull] Lab2GrammarParser.RestContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>Dec</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// </summary>
@@ -87,12 +80,12 @@ public interface ILab2GrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitMultiplicationOrDivision([NotNull] Lab2GrammarParser.MultiplicationOrDivisionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>CellPos</c>
+	/// Visit a parse tree produced by the <c>CellRef</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitCellPos([NotNull] Lab2GrammarParser.CellPosContext context);
+	Result VisitCellRef([NotNull] Lab2GrammarParser.CellRefContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Power</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
@@ -114,4 +107,11 @@ public interface ILab2GrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitInc([NotNull] Lab2GrammarParser.IncContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Invalid</c>
+	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInvalid([NotNull] Lab2GrammarParser.InvalidContext context);
 }

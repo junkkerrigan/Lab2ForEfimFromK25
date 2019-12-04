@@ -47,20 +47,6 @@ public partial class Lab2GrammarBaseListener : ILab2GrammarListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitUnit([NotNull] Lab2GrammarParser.UnitContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Rest</c>
-	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterRest([NotNull] Lab2GrammarParser.RestContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by the <c>Rest</c>
-	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitRest([NotNull] Lab2GrammarParser.RestContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by the <c>Dec</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -145,19 +131,19 @@ public partial class Lab2GrammarBaseListener : ILab2GrammarListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMultiplicationOrDivision([NotNull] Lab2GrammarParser.MultiplicationOrDivisionContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>CellPos</c>
+	/// Enter a parse tree produced by the <c>CellRef</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterCellPos([NotNull] Lab2GrammarParser.CellPosContext context) { }
+	public virtual void EnterCellRef([NotNull] Lab2GrammarParser.CellRefContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by the <c>CellPos</c>
+	/// Exit a parse tree produced by the <c>CellRef</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitCellPos([NotNull] Lab2GrammarParser.CellPosContext context) { }
+	public virtual void ExitCellRef([NotNull] Lab2GrammarParser.CellRefContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Power</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
@@ -200,6 +186,20 @@ public partial class Lab2GrammarBaseListener : ILab2GrammarListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitInc([NotNull] Lab2GrammarParser.IncContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Invalid</c>
+	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterInvalid([NotNull] Lab2GrammarParser.InvalidContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Invalid</c>
+	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitInvalid([NotNull] Lab2GrammarParser.InvalidContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

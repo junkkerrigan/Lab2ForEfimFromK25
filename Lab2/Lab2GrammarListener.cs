@@ -41,18 +41,6 @@ public interface ILab2GrammarListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitUnit([NotNull] Lab2GrammarParser.UnitContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Rest</c>
-	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterRest([NotNull] Lab2GrammarParser.RestContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>Rest</c>
-	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitRest([NotNull] Lab2GrammarParser.RestContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>Dec</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// </summary>
@@ -125,17 +113,17 @@ public interface ILab2GrammarListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitMultiplicationOrDivision([NotNull] Lab2GrammarParser.MultiplicationOrDivisionContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>CellPos</c>
+	/// Enter a parse tree produced by the <c>CellRef</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterCellPos([NotNull] Lab2GrammarParser.CellPosContext context);
+	void EnterCellRef([NotNull] Lab2GrammarParser.CellRefContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>CellPos</c>
+	/// Exit a parse tree produced by the <c>CellRef</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitCellPos([NotNull] Lab2GrammarParser.CellPosContext context);
+	void ExitCellRef([NotNull] Lab2GrammarParser.CellRefContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Power</c>
 	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
@@ -172,4 +160,16 @@ public interface ILab2GrammarListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitInc([NotNull] Lab2GrammarParser.IncContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Invalid</c>
+	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterInvalid([NotNull] Lab2GrammarParser.InvalidContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Invalid</c>
+	/// labeled alternative in <see cref="Lab2GrammarParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitInvalid([NotNull] Lab2GrammarParser.InvalidContext context);
 }
