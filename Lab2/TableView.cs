@@ -80,8 +80,8 @@ namespace Lab2
                 Rows.RemoveAt(idx);
                 return;
             }
-            var isDelete = MessageBox.Show("If you delete this row, some cells" +
-                " will be cleared. Delete this row?", "Danger",
+            var isDelete = MessageBox.Show("Removing row will lead to some cells" +
+                " to become empty. Remove row?", "Danger",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (isDelete == DialogResult.No) return;
             try
@@ -101,7 +101,16 @@ namespace Lab2
         }
         public void DeleteColumn(string name)
         {
-            int idx = Sys26.Sys26ToNum(name);
+            int idx;
+            try
+            {
+                idx = int.Parse(name);
+            }
+            catch
+            {
+                throw new Exception();
+            }
+            if (idx < 1) throw new ArgumentOutOfRangeException();
             idx--;
             bool canDelete = true;
             for (int i = 0; i < RowCount; i++)
@@ -120,8 +129,8 @@ namespace Lab2
                 Columns.RemoveAt(idx);
                 return;
             }
-            var isDelete = MessageBox.Show("If you delete this column, some cells" +
-                " will be cleared. Delete this column?", "Danger",
+            var isDelete = MessageBox.Show("Removing column will lead to some cells" +
+                " to become empty. Remove column?", "Danger",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (isDelete == DialogResult.No) return;
             try

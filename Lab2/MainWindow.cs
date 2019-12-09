@@ -111,16 +111,16 @@ namespace Lab2
     public partial class MainWindow : Form
     {
         public TableView Table { get; set; }
-        bool UpToDate = true;
+        bool ChangesMade = true;
         TextBox ExpressionInCell;
         Panel MenuPanel;
         Label Rows, Cols;
-        Button AddRow, AddCol, DelRow, DelCol, Save, Open;
+        Button AddRow, AddColumn, RemoveRow, RemoveColumn, Save, Open;
         public MainWindow()
         {
             InitializeComponent();
             AddMenuPanel();
-            AddTable();
+            AddTable(null);
             Resize += MainWindow_SizeChanged;
             FormClosing += MainWindow_FormClosing;
         }
@@ -160,13 +160,13 @@ namespace Lab2
                     Table.CurCell.Expression = oldExpr;
                     Table.Recalculate(Table.CurCell);
                 }
-                UpToDate = false;
+                ChangesMade = false;
             };
             MenuPanel.Controls.Add(ExpressionInCell);
             AddTableButtons();
             Controls.Add(MenuPanel);
         }
-        void AddTable(TableView table = null)
+        void AddTable(TableView table)
         {
             if (table == null)
             {
@@ -227,16 +227,27 @@ namespace Lab2
                     changed.Expression = oldExpr;
                     Table.Recalculate(changed);
                 }
-                UpToDate = false;
+                ChangesMade = false;
             };
             Controls.Add(Table);
             Table.ResumeLayout();
         }
         void AddFileButtons()
         {
-            Save = new Button()
+            Button About = new Button()
             {
                 Location = new Point(0, 5),
+                Size = new Size(80, 30),
+                Text = "About",
+                Font = new Font("Times New Roman", 12),
+            };
+            About.Click += (s, e) =>
+            {
+                MessageBox.Show("Волотовський Єфім, К-25. \nВаріант №5, реалізовані операції: ділення націло, взяття по модулю, inc, dec, піднесення до степеня");
+            };
+            Save = new Button()
+            {
+                Location = new Point(About.Right + 15, 5),
                 Size = new Size(80, 30),
                 Text = "Save",
                 Font = new Font("Times New Roman", 12),
@@ -251,7 +262,7 @@ namespace Lab2
                 {
                     File.WriteAllText(saveTo.FileName, Table.ToFile());
                 }
-                UpToDate = true;
+                ChangesMade = true;
             };
             Open = new Button()
             {
@@ -262,6 +273,14 @@ namespace Lab2
             };
             Open.Click += (s, e) =>
             {
+                if (ChangesMade)
+                {
+                    var isSave = MessageBox.Show("Save changes?", "", MessageBoxButtons.YesNoCancel);
+                    if (isSave == DialogResult.Yes)
+                    {
+                        Save.PerformClick();
+                    }
+                }
                 var openFrom = new OpenFileDialog()
                 {
                     Filter = "Text files (*.txt)|*.txt",
@@ -280,6 +299,7 @@ namespace Lab2
                     }
                 }
             };
+            MenuPanel.Controls.Add(About);
             MenuPanel.Controls.Add(Save);
             MenuPanel.Controls.Add(Open);
         }
@@ -300,15 +320,15 @@ namespace Lab2
                 Size = new Size(30, 30),
             };
             AddRow.Click += (s, e) => Table.AddRows(1);
-            DelRow = new Button()
+            RemoveRow = new Button()
             {
                 Text = "-",
                 Location = new Point(AddRow.Right + 10, 5),
                 Size = new Size(30, 30),
             };
-            DelRow.Click += (s, e) =>
+            RemoveRow.Click += (s, e) =>
             {
-                string input = Dialog.Show("Enter number of row to delete:", "");
+                string input = Dialog.Show("Which row delete?", "");
                 if (input == "") return;
                 try
                 {
@@ -328,27 +348,27 @@ namespace Lab2
             };
             Cols = new Label()
             {
-                Location = new Point(DelRow.Right + 40, 10),
+                Location = new Point(RemoveRow.Right + 40, 10),
                 Text = "Columns:",
                 Font = new Font("Times New Roman", 12),
                 Size = new Size(100, 30),
             };
-            AddCol = new Button()
+            AddColumn = new Button()
             {
                 Text = "+",
                 Location = new Point(Cols.Right, 5),
                 Size = new Size(30, 30),
             };
-            AddCol.Click += (s, e) => Table.AddColumns(1);
-            DelCol = new Button()
+            AddColumn.Click += (s, e) => Table.AddColumns(1);
+            RemoveColumn = new Button()
             {
                 Text = "-",
-                Location = new Point(AddCol.Right + 10, 5),
+                Location = new Point(AddColumn.Right + 10, 5),
                 Size = new Size(30, 30),
             };
-            DelCol.Click += (s, e) =>
+            RemoveColumn.Click += (s, e) =>
             {
-                string input = Dialog.Show("Enter name of column to delete:", "");
+                string input = Dialog.Show("Which column delete?", "");
                 if (input == "") return;
                 try
                 {
@@ -367,26 +387,26 @@ namespace Lab2
             };
             MenuPanel.Controls.Add(Rows);
             MenuPanel.Controls.Add(AddRow);
-            MenuPanel.Controls.Add(DelRow);
+            MenuPanel.Controls.Add(RemoveRow);
             MenuPanel.Controls.Add(Cols);
-            MenuPanel.Controls.Add(AddCol);
-            MenuPanel.Controls.Add(DelCol);
+            MenuPanel.Controls.Add(AddColumn);
+            MenuPanel.Controls.Add(RemoveColumn);
         }
         void MainWindow_SizeChanged(object sender, EventArgs e)
         {
             MenuPanel.Width = ClientSize.Width - 120;
             Rows.Location = new Point(Math.Max(330, (MenuPanel.Width - 300) / 2), 10);
             AddRow.Location = new Point(Rows.Right, 5);
-            DelRow.Location = new Point(AddRow.Right + 10, 5);
-            Cols.Location = new Point(DelRow.Right + 40, 10);
-            AddCol.Location = new Point(Cols.Right, 5);
-            DelCol.Location = new Point(AddCol.Right + 10, 5);
+            RemoveRow.Location = new Point(AddRow.Right + 10, 5);
+            Cols.Location = new Point(RemoveRow.Right + 40, 10);
+            AddColumn.Location = new Point(Cols.Right, 5);
+            RemoveColumn.Location = new Point(AddColumn.Right + 10, 5);
             Table.Size = new Size(ClientSize.Width - 60,
                     ClientSize.Height - MenuPanel.Bottom - 60);
         }
         void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (UpToDate) return;
+            if (ChangesMade) return;
             var isSave = MessageBox.Show("Save changes?", "", MessageBoxButtons.YesNoCancel);
             if (isSave == DialogResult.Yes)
             {
