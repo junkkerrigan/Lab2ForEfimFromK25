@@ -111,7 +111,7 @@ namespace Lab2
     public partial class MainWindow : Form
     {
         public TableView Table { get; set; }
-        bool ChangesMade = true;
+        bool ChangesMade = false;
         TextBox ExpressionInCell;
         Panel MenuPanel;
         Label Rows, Cols;
@@ -160,7 +160,7 @@ namespace Lab2
                     Table.CurCell.Expression = oldExpr;
                     Table.Recalculate(Table.CurCell);
                 }
-                ChangesMade = false;
+                ChangesMade = true;
             };
             MenuPanel.Controls.Add(ExpressionInCell);
             AddTableButtons();
@@ -227,7 +227,7 @@ namespace Lab2
                     changed.Expression = oldExpr;
                     Table.Recalculate(changed);
                 }
-                ChangesMade = false;
+                ChangesMade = true;
             };
             Controls.Add(Table);
             Table.ResumeLayout();
@@ -262,7 +262,7 @@ namespace Lab2
                 {
                     File.WriteAllText(saveTo.FileName, Table.ToFile());
                 }
-                ChangesMade = true;
+                ChangesMade = false;
             };
             Open = new Button()
             {
@@ -275,7 +275,7 @@ namespace Lab2
             {
                 if (ChangesMade)
                 {
-                    var isSave = MessageBox.Show("Save changes?", "", MessageBoxButtons.YesNoCancel);
+                    var isSave = MessageBox.Show("Save changes in current table?", "", MessageBoxButtons.YesNoCancel);
                     if (isSave == DialogResult.Yes)
                     {
                         Save.PerformClick();
@@ -406,7 +406,7 @@ namespace Lab2
         }
         void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (ChangesMade) return;
+            if (!ChangesMade) return;
             var isSave = MessageBox.Show("Save changes?", "", MessageBoxButtons.YesNoCancel);
             if (isSave == DialogResult.Yes)
             {
