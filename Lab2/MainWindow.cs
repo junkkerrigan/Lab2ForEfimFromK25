@@ -307,8 +307,8 @@ namespace Lab2
         {
             Rows = new Label()
             {
-                Location = new Point(
-                    Math.Max(580, (MenuPanel.Width - 300) / 2), 10),
+                Location = new Point(ExpressionInCell.Right + 
+                    Math.Max(30, (MenuPanel.Right - ExpressionInCell.Right - 350) / 2), 10),
                 Text = "Rows:",
                 Font = new Font("Times New Roman", 12),
                 Size = new Size(70, 30),
@@ -395,7 +395,8 @@ namespace Lab2
         void MainWindow_SizeChanged(object sender, EventArgs e)
         {
             MenuPanel.Width = ClientSize.Width - 120;
-            Rows.Location = new Point(Math.Max(330, (MenuPanel.Width - 300) / 2), 10);
+            Rows.Left = ExpressionInCell.Right +
+                    Math.Max(30, (MenuPanel.Right - ExpressionInCell.Right - 350) / 2);
             AddRow.Location = new Point(Rows.Right, 5);
             RemoveRow.Location = new Point(AddRow.Right + 10, 5);
             Cols.Location = new Point(RemoveRow.Right + 40, 10);
