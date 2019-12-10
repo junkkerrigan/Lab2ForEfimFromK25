@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab2", "Lab2\Lab2.csproj", "{BA2F5BAD-0720-4FC2-82A6-C4D435253061}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lab2", "Lab2\Lab2.csproj", "{BA2F5BAD-0720-4FC2-82A6-C4D435253061}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab2OOP", "..\..\Ira Cyb K-25\Lab2\Lab2OOP\Lab2OOP.csproj", "{A6CF49E9-AA95-4427-A62B-A3E746C66093}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BA2F5BAD-0720-4FC2-82A6-C4D435253061}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA2F5BAD-0720-4FC2-82A6-C4D435253061}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA2F5BAD-0720-4FC2-82A6-C4D435253061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6CF49E9-AA95-4427-A62B-A3E746C66093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6CF49E9-AA95-4427-A62B-A3E746C66093}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6CF49E9-AA95-4427-A62B-A3E746C66093}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6CF49E9-AA95-4427-A62B-A3E746C66093}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

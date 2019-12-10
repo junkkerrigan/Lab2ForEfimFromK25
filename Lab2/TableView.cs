@@ -247,6 +247,7 @@ namespace Lab2
                 foreach (CellView c in r.Cells)
                 {
                     c.Recalculated = false;
+                    c.Visited = false;
                 }
             }
             foreach (var d in updated.Connections)
